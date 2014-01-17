@@ -6,7 +6,7 @@ license that can be found in the LICENSE file.
 <link rel="import" href="../polymer/polymer.html">
 <script src="src-min-noconflict/ace.js"></script>
 
-<polymer-element name="ace-element" attributes="theme mode value readonly wrap fontSize tabSize">
+<polymer-element name="ace-element" attributes="theme mode value readonly wrap fontSize tabSize boundValue">
   <template>
     <style type="text/css" media="screen">
       :host {
@@ -33,6 +33,7 @@ license that can be found in the LICENSE file.
       theme: 'monokai',
       readonly: false,
       value: null,
+      boundValue: null,
       wrap: false,
       // allow styling from the outside world!
       applyAuthorStyles: true,
@@ -118,12 +119,14 @@ license that can be found in the LICENSE file.
         this.editor.clearSelection();
       },
       editorBlurAction: function(event) {
+        this.boundValue = this.editorValue;
         if (this._value !== null && this._value != this.editorValue) {
           this.fire('editor-change', {value: this.editorValue, oldValue: this._value});
         }
         this._value = this.editorValue;
       },
       editorChangeAction: function() {
+        this.boundValue = this.editorValue;
         this.fire('editor-input', {value: this.editorValue, oldValue: this._value});
       },
       get editorValue() {
