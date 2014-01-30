@@ -31,6 +31,7 @@ license that can be found in the LICENSE file.
     <div class="ajaxorg-ace" id="editor"></div>
   </template>
   <script>
+  (function(style) {
     Polymer('ace-element', {
       mode: 'javascript',
       theme: 'monokai',
@@ -38,7 +39,20 @@ license that can be found in the LICENSE file.
       value: null,
       wrap: false,
       // allow styling from the outside world!
-      applyAuthorStyles: true,
+      //applyAuthorStyles: true,
+      registerCallback: function(polymerElt) {
+        var selectors = [
+          '#ace_editor',
+          '#ace-tm'
+        ];
+        var content = polymerElt.templateContent();
+        for (var i=0, l=selectors.length, s, n; (i<l) && (s=selectors[i]); i++) {
+          n = document.querySelector(s);
+          if (n) {
+            content.appendChild(cloneStyle(n));
+          }
+        }
+      },
       // TODO(sorvell): to work in IE reliably, can only be 
       // created in enteredView. However, api that wants to access this.editor
       // may be used before that. Instead of making each function bail if
@@ -71,6 +85,13 @@ license that can be found in the LICENSE file.
       },
       themeChanged: function() {
         this.editor.setTheme('ace/theme/' + this.theme);
+        // find style
+        this.onMutation(document.head, function() {
+          var style = document.querySelector('#ace-' + this.theme);
+          if (style) {
+            this.shadowRoot.appendChild(cloneStyle(style));
+          }
+        });
       },
       valueChanged: function() {
         this.editorValue = this.value;
@@ -140,5 +161,13 @@ license that can be found in the LICENSE file.
         this.editor.focus();
       }
     });
+
+    // IE safe style clone
+    function cloneStyle(style) {
+      var s = document.createElement('style');
+      s.textContent = style.textContent;
+      return s;
+    }
+  })();
   </script>
 </polymer-element>
