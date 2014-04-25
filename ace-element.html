@@ -1,3 +1,6 @@
+<!-- can remove when https://code.google.com/p/chromium/issues/detail?id=336698
+  is addressed. -->
+<meta charset="UTF-8">
 <!--
 Copyright 2012 The Polymer Authors. All rights reserved.
 Use of this source code is governed by a BSD-style
@@ -6,7 +9,7 @@ license that can be found in the LICENSE file.
 <link rel="import" href="../polymer/polymer.html">
 <script src="src-min-noconflict/ace.js"></script>
 
-<polymer-element name="ace-element" attributes="theme mode value readonly wrap fontSize tabSize boundValue">
+<polymer-element name="ace-element" attributes="theme mode value readonly wrap fontSize tabSize themes">
   <template>
     <style type="text/css" media="screen">
       :host {
@@ -28,15 +31,29 @@ license that can be found in the LICENSE file.
     <div class="ajaxorg-ace" id="editor"></div>
   </template>
   <script>
+  (function(style) {
     Polymer('ace-element', {
       mode: 'javascript',
       theme: 'monokai',
+      themes:null,
       readonly: false,
       value: null,
-      boundValue: null,
       wrap: false,
       // allow styling from the outside world!
-      applyAuthorStyles: true,
+      //applyAuthorStyles: true,
+      registerCallback: function(polymerElt) {
+        var selectors = [
+          '#ace_editor',
+          '#ace-tm'
+        ];
+        var content = polymerElt.templateContent();
+        for (var i=0, l=selectors.length, s, n; (i<l) && (s=selectors[i]); i++) {
+          n = document.querySelector(s);
+          if (n) {
+            content.appendChild(cloneStyle(n));
+          }
+        }
+      },
       // TODO(sorvell): to work in IE reliably, can only be 
       // created in enteredView. However, api that wants to access this.editor
       // may be used before that. Instead of making each function bail if
@@ -44,6 +61,39 @@ license that can be found in the LICENSE file.
       // initialization time, any pending changes are synch'd.
       ready: function() {
         this.editor = ace.edit(document.createElement('div'));
+        this.themes = [
+           "xcode",
+"vibrant_ink",
+"twilight",
+"tomorrow_night_eighties",
+"tomorrow_night_bright",
+"tomorrow_night_blue",
+"tomorrow_night",
+"tomorrow",
+"textmate",
+"terminal",
+"solarized_light",
+"solarized_dark",
+"pastel_on_dark",
+"monokai",
+"mono_industrial",
+"merbivore_soft",
+"merbivore",
+"kuroir",
+"katzenmilch",
+"idle_fingers",
+"github",
+"eclipse",
+"dreamweaver",
+"dawn",
+"crimson_editor",
+"cobalt",
+"clouds_midnight",
+"clouds",
+"chrome",
+"chaos",
+"ambiance",
+        ]
       },
       enteredView: function() {
         this.initializeEditor();
@@ -59,7 +109,13 @@ license that can be found in the LICENSE file.
         this.tabSizeChanged();
         this.editor.on("blur", this.editorBlurAction.bind(this));
         this.editor.on('change', this.editorChangeAction.bind(this));
-        this.value = this.textContent;
+        this.editor.setShowInvisibles( true );
+        
+        if(this.textContent.trim() !== "")
+        {
+           this.value = this.textContent;
+        }
+        this.editor.setValue(this.value);
       },
       fontSizeChanged: function() {
         this.$.editor.style.fontSize = this.fontSize;
@@ -69,8 +125,16 @@ license that can be found in the LICENSE file.
       },
       themeChanged: function() {
         this.editor.setTheme('ace/theme/' + this.theme);
+        // find style
+        this.onMutation(document.head, function() {
+          var style = document.querySelector('#ace-' + this.theme);
+          if (style) {
+            this.shadowRoot.appendChild(cloneStyle(style));
+          }
+        });
       },
       valueChanged: function() {
+        console.log("value changed in ace", this.value);
         this.editorValue = this.value;
         this.editor.clearSelection();
         this.editor.resize();
@@ -119,14 +183,12 @@ license that can be found in the LICENSE file.
         this.editor.clearSelection();
       },
       editorBlurAction: function(event) {
-        this.boundValue = this.editorValue;
         if (this._value !== null && this._value != this.editorValue) {
           this.fire('editor-change', {value: this.editorValue, oldValue: this._value});
         }
         this._value = this.editorValue;
       },
       editorChangeAction: function() {
-        this.boundValue = this.editorValue;
         this.fire('editor-input', {value: this.editorValue, oldValue: this._value});
       },
       get editorValue() {
@@ -140,5 +202,13 @@ license that can be found in the LICENSE file.
         this.editor.focus();
       }
     });
+
+    // IE safe style clone
+    function cloneStyle(style) {
+      var s = document.createElement('style');
+      s.textContent = style.textContent;
+      return s;
+    }
+  })();
   </script>
 </polymer-element>
