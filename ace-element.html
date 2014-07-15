@@ -40,8 +40,6 @@ license that can be found in the LICENSE file.
       value: null,
       wrap: false,
       showInvisibles:false,
-      // allow styling from the outside world!
-      //applyAuthorStyles: true,
       registerCallback: function(polymerElt) {
         var selectors = [
           '#ace_editor',
@@ -155,7 +153,7 @@ license that can be found in the LICENSE file.
         }
       },
       showInvisiblesChanged: function(){
-        this.editor.setShowInvisibles( this.showInvisibles );
+        this.editor.setShowInvisibles(this.showInvisibles);
       },
       foldTag: function(tag) {
         var s = this.editor.getSession();
