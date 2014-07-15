@@ -9,7 +9,7 @@ license that can be found in the LICENSE file.
 <link rel="import" href="../polymer/polymer.html">
 <script src="src-min-noconflict/ace.js"></script>
 
-<polymer-element name="ace-element" attributes="theme themes mode value readonly wrap fontSize tabSize showInvisibles">
+<polymer-element name="ace-element" attributes="theme themes mode value readonly wrap fontSize tabSize showInvisibleCharacters">
   <template>
     <style type="text/css" media="screen">
       :host {
@@ -39,7 +39,7 @@ license that can be found in the LICENSE file.
       readonly: false,
       value: null,
       wrap: false,
-      showInvisibles:false,
+      showInvisibleCharacters:false,
       registerCallback: function(polymerElt) {
         var selectors = [
           '#ace_editor',
@@ -106,7 +106,7 @@ license that can be found in the LICENSE file.
         this.readonlyChanged();
         this.wrapChanged();
         this.tabSizeChanged();
-        this.showInvisiblesChanged();
+        this.showInvisibleCharactersChanged();
         this.editor.on("blur", this.editorBlurAction.bind(this));
         this.editor.on('change', this.editorChangeAction.bind(this));
         
@@ -152,8 +152,8 @@ license that can be found in the LICENSE file.
           this.editor.getSession().setTabSize(this.tabSize);
         }
       },
-      showInvisiblesChanged: function(){
-        this.editor.setShowInvisibles(this.showInvisibles);
+      showInvisibleCharactersChanged: function(){
+        this.editor.setShowInvisibles(this.showInvisibleCharacters);
       },
       foldTag: function(tag) {
         var s = this.editor.getSession();
