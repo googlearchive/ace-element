@@ -68,13 +68,13 @@ license that can be found in the LICENSE file.
         };
 
         function addStyle(id, el) {
-			    var s = document.createElement('style');
-			    s.textContent = t.styles[id];
-			    el.appendChild(s);
-		    }
+          var s = document.createElement('style');
+          s.textContent = t.styles[id];
+          el.appendChild(s);
+        }
     		// and before calling ace.edit
-		    for (var i in t.styles)
-			    addStyle(i, this.shadowRoot);
+        for (var i in t.styles)
+          addStyle(i, this.shadowRoot);
         
         this.editor = ace.edit(document.createElement('div'));
       },
