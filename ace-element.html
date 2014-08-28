@@ -59,6 +59,24 @@ license that can be found in the LICENSE file.
       // this.editor is not set, we create a dummy editor. At editor
       // initialization time, any pending changes are synch'd.
       ready: function() {
+        ace.require("ace/lib/dom").importCssString = function(cssText, id) {
+          if (this.styles[id]) {
+            return;
+          }
+          
+          this.styles[id] = cssText;
+          addStyle.bind(this)(id, this.shadowRoot);
+        }.bind(this);
+
+        function addStyle(id, el) {
+          var s = document.createElement('style');
+          s.textContent = this.styles[id];
+          el.appendChild(s);
+        };
+
+        for (var i in this.styles) {
+          addStyle.bind(this)(i, this.shadowRoot);
+        }
         this.editor = ace.edit(document.createElement('div'));
       },
       enteredView: function() {
@@ -85,13 +103,6 @@ license that can be found in the LICENSE file.
       },
       themeChanged: function() {
         this.editor.setTheme('ace/theme/' + this.theme);
-        // find style
-        this.onMutation(document.head, function() {
-          var style = document.querySelector('#ace-' + this.theme);
-          if (style) {
-            this.shadowRoot.appendChild(cloneStyle(style));
-          }
-        });
       },
       valueChanged: function() {
         this.editorValue = this.value;
