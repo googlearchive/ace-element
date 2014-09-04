@@ -85,13 +85,23 @@ license that can be found in the LICENSE file.
       },
       themeChanged: function() {
         this.editor.setTheme('ace/theme/' + this.theme);
-        // find style
-        this.onMutation(document.head, function() {
-          var style = document.querySelector('#ace-' + this.theme);
+        this._whenMatches(document.head, '#ace-' + this.theme, 'applyTheme');
+      },
+      _whenMatches: function(node, selector, method) {
+        var m = node.querySelector(selector);
+        if (m) {
+          if (this[method]) {
+            this[method].call(this, m);
+          }
+        } else {
+          var cb = this._whenMatches.bind(this, node, selector, method);
+          this.onMutation(node, cb);
+        }
+      },
+      applyTheme: function(style) {
           if (style) {
             this.shadowRoot.appendChild(cloneStyle(style));
           }
-        });
       },
       valueChanged: function() {
         this.editorValue = this.value;
