@@ -9,7 +9,7 @@ license that can be found in the LICENSE file.
 <link rel="import" href="../polymer/polymer.html">
 <script src="src-min-noconflict/ace.js"></script>
 
-<polymer-element name="ace-element" attributes="theme mode value readonly wrap fontSize tabSize">
+<polymer-element name="ace-element" attributes="theme themes mode value readonly wrap fontSize tabSize showInvisibleCharacters">
   <template>
     <style type="text/css" media="screen">
       :host {
@@ -35,11 +35,11 @@ license that can be found in the LICENSE file.
     Polymer('ace-element', {
       mode: 'javascript',
       theme: 'monokai',
+      themes:null,
       readonly: false,
       value: null,
       wrap: false,
-      // allow styling from the outside world!
-      //applyAuthorStyles: true,
+      showInvisibleCharacters:false,
       registerCallback: function(polymerElt) {
         var selectors = [
           '#ace_editor',
@@ -60,6 +60,39 @@ license that can be found in the LICENSE file.
       // initialization time, any pending changes are synch'd.
       ready: function() {
         this.editor = ace.edit(document.createElement('div'));
+        this.themes = [
+          "xcode",
+          "vibrant_ink",
+          "twilight",
+          "tomorrow_night_eighties",
+          "tomorrow_night_bright",
+          "tomorrow_night_blue",
+          "tomorrow_night",
+          "tomorrow",
+          "textmate",
+          "terminal",
+          "solarized_light",
+          "solarized_dark",
+          "pastel_on_dark",
+          "monokai",
+          "mono_industrial",
+          "merbivore_soft",
+          "merbivore",
+          "kuroir",
+          "katzenmilch",
+          "idle_fingers",
+          "github",
+          "eclipse",
+          "dreamweaver",
+          "dawn",
+          "crimson_editor",
+          "cobalt",
+          "clouds_midnight",
+          "clouds",
+          "chrome",
+          "chaos",
+          "ambiance",
+        ]
       },
       attached: function() {
         this.initializeEditor();
@@ -73,9 +106,15 @@ license that can be found in the LICENSE file.
         this.readonlyChanged();
         this.wrapChanged();
         this.tabSizeChanged();
+        this.showInvisibleCharactersChanged();
         this.editor.on("blur", this.editorBlurAction.bind(this));
         this.editor.on('change', this.editorChangeAction.bind(this));
-        this.value = this.textContent;
+        
+        if(this.textContent.trim() !== "")
+        {
+           this.value = this.textContent;
+        }
+        this.editor.setValue(this.value);
       },
       fontSizeChanged: function() {
         this.$.editor.style.fontSize = this.fontSize;
@@ -122,6 +161,9 @@ license that can be found in the LICENSE file.
         if (this.tabSize) {
           this.editor.getSession().setTabSize(this.tabSize);
         }
+      },
+      showInvisibleCharactersChanged: function(){
+        this.editor.setShowInvisibles(this.showInvisibleCharacters);
       },
       foldTag: function(tag) {
         var s = this.editor.getSession();
