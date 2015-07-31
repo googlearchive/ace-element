@@ -14,7 +14,7 @@
 @demo demo/index.html
 -->
 
-<dom-module id="ace-element" attributes="theme mode value readonly wrap fontSize tabSize">
+<dom-module id="ace-element">
 <style type="text/css" media="screen">
   :host {
     display: block;
@@ -71,6 +71,16 @@
         type: Boolean,
         reflectToAttribute: true,
         observer: '_readonlyChanged'
+      },
+
+      /**
+      * The editor tab size
+      */
+      tabSize: {
+        value: 4,
+        type: Number,
+        reflectToAttribute: true,
+        observer: '_tabSizeChanged'
       },
 
       /**
@@ -214,6 +224,7 @@
     },
 
     _tabSizeChanged: function() {
+      if (! this.editor) return;
       if (this.tabSize) {
         this.editor.getSession().setTabSize(this.tabSize);
       }
